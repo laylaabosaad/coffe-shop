@@ -1,0 +1,70 @@
+1-install JWT using "composer require tymon/jwt-auth"
+2- Publish the package config by "php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider""
+3- Generate JWT secrete with "php artisan jwt:secret"
+
+4- Modify the config/auth.php file and set the guard driver to jwt
+     'guards' => [
+    'api' => [
+        'driver' => 'jwt',
+        'provider' => 'users',
+    ],
+],
+
+5- In app/Models/User.php (or app/User.php in older versions), implement the JWTSubject interface:
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
+class User extends Authenticatable implements JWTSubject
+{
+    /**
+     * Get the identifier that will be stored in the JWT token.
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return an array with custom claims to be added to the JWT token.
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+}
+
+6- Generate a new controller using " php artisan make:controller AuthController "
+
+7- Inside app/Http/Controllers/AuthController.php, implement the login, register, and logout functions as implemented
+
+8- Create Middleware to protet the routes using " php artisan make:middleware JwtMiddleware "
+
+9- In app/Http/Middleware/JwtMiddleware.php, update the handle function as implemented
+
+10- bootstrap/app.php file, add 
+          ->withMiddleware(function (Middleware $middleware) {
+              $middleware->alias([
+             'jwt' => JwtMiddleware::class
+              ]);
+          })
+
+11 - Create routes/api.php manually
+12 - php artisan install:api
+
+
+
+
+
+
+------------------------EXTRA NOTEEEESS-----------------------
+ 
+
+Instead of causing migration of the whole tables if I want to add a column, I use the command
+
+name of the table: add_email_verification_code_to_users_table
+removing or updating the old table: =users
+
+and we add within add_email_verification_code_to_users_table the changes we want
+" php artisan make:migration add_email_verification_code_to_users_table --table=users "
+
+
+The command to create EmailVerificationCode in folder Mail is " php artisan make:mail EmailVerificationCode --markdown=emails.verify_code"
